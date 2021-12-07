@@ -72,6 +72,28 @@ public:
                 resourceRequest.memRequest = BALANCE.memRequest + memOffset;
                 break;
 
+            case CPUHeavySmall:
+                cpuOffset *= CPUHEAVYSMALL.cpuRequest ;
+                memOffset *= CPUHEAVYSMALL.memRequest; 
+
+                resourceRequest.cpuRequest = CPUHEAVYSMALL.cpuRequest + cpuOffset;
+                resourceRequest.memRequest = CPUHEAVYSMALL.memRequest + memOffset;
+                break;
+            case MemHeavySmall:
+                cpuOffset *= MEMHEAVYSMALL.cpuRequest ;
+                memOffset *= MEMHEAVYSMALL.memRequest; 
+
+                resourceRequest.cpuRequest = MEMHEAVYSMALL.cpuRequest + cpuOffset;
+                resourceRequest.memRequest = MEMHEAVYSMALL.memRequest + memOffset;
+                break;
+            case BalanceSmall:
+                cpuOffset *= BALANCESMALL.cpuRequest ;
+                memOffset *= BALANCESMALL.memRequest; 
+
+                resourceRequest.cpuRequest = BALANCESMALL.cpuRequest + cpuOffset;
+                resourceRequest.memRequest = BALANCESMALL.memRequest + memOffset;
+                break;
+
             default:
                 break;
         }

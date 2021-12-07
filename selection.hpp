@@ -30,10 +30,11 @@ public:
     SlaveSelection(double weight, double randomThreshold, double offset);
 
     int randomSelect(ResourceRequest &request, vector<Slave> &slaveVec);
-    int randomSelect(ResourceRequest &request, vector<Slave> &slaveVec, double weight, double randomThreshold, double offset);
 
-    int defaultSelect(ResourceRequest &request, vector<Slave> &slaveVec, double weight);
 
+    int defaultSelect(ResourceRequest &request, vector<Slave> &slaveVec, double weight, ResDistanceType resDistanceType);
+    int randomSelect(ResourceRequest &request, vector<Slave> &slaveVec, double weight, double randomThreshold, double offset, 
+    ResDistanceType resDistanceType, float &iterationTime);
     int randomShuffle(ResourceRequest &request, vector<Slave> &slaveVec);
 
     bool isAcceptable();

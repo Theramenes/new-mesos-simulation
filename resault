@@ -1,0 +1,69 @@
+[Running] cd "/home/theramenes/projects/test/c++_test/" && g++ *.cpp -o fine_grained_allocator_test && "/home/theramenes/projects/test/c++_test/"fine_grained_allocator_test
+********** Testing Strategy: Random Shuffle. **********
+The Performance of: Random Shuffle. Using Resource Distance Type of: euclideanCentra
+Tested 100 Times.
+Average Allocation Failed: 204
+Average Resource Use Rate: 0.749041
+Average Resource Distance: 0.346108
+Average Iteration Time: 0
+
+********** Testing Strategy: Default Find Max. **********
+The Performance of: Default Find Max. Using Resource Distance Type of: euclideanCentra
+Tested 100 Times.
+Average Allocation Failed: 138
+Average Resource Use Rate: 0.775482
+Average Resource Distance: 0.301659
+Average Iteration Time: 0
+
+The Performance of: Default Find Max. Using Resource Distance Type of: euclideanDecentra
+Tested 100 Times.
+Average Allocation Failed: 112
+Average Resource Use Rate: 0.783237
+Average Resource Distance: 0.287839
+Average Iteration Time: 0
+
+The Performance of: Default Find Max. Using Resource Distance Type of: chebyCentra
+Tested 100 Times.
+Average Allocation Failed: 138
+Average Resource Use Rate: 0.774318
+Average Resource Distance: 0.30382
+Average Iteration Time: 0
+
+The Performance of: Default Find Max. Using Resource Distance Type of: chebyDecentra
+Tested 100 Times.
+Average Allocation Failed: 113
+Average Resource Use Rate: 0.78173
+Average Resource Distance: 0.291292
+Average Iteration Time: 0
+
+********** Testing Strategy: Random Find Max. **********
+The Performance of: Random Find Max. Using Resource Distance Type of: euclideanCentra
+Tested 100 Times.
+Average Allocation Failed: 318
+Average Resource Use Rate: 0.646345
+Average Resource Distance: 0.212269
+Average Iteration Time: 98.3757
+
+The Performance of: Random Find Max. Using Resource Distance Type of: euclideanDecentra
+Tested 100 Times.
+Average Allocation Failed: 1000
+Average Resource Use Rate: 0
+Average Resource Distance: 0
+Average Iteration Time: 150
+
+The Performance of: Random Find Max. Using Resource Distance Type of: chebyCentra
+Tested 100 Times.
+Average Allocation Failed: 319
+Average Resource Use Rate: 0.647427
+Average Resource Distance: 0.21224
+Average Iteration Time: 98.3055
+
+The Performance of: Random Find Max. Using Resource Distance Type of: chebyDecentra
+Tested 100 Times.
+Average Allocation Failed: 1000
+Average Resource Use Rate: 0
+Average Resource Distance: 0
+Average Iteration Time: 150
+
+
+[Done] exited with code=0 in 59.934 seconds

@@ -79,13 +79,13 @@ void InheritClass::_generateOffers()
 // }
 // Inherit End
 
-int main()
-{
-    InheritClass inheritClass;
-    BaseClass baseClass;
+// int main()
+// {
+//     InheritClass inheritClass;
+//     BaseClass baseClass;
 
-    baseClass.offer();
-    inheritClass.offer();
+//     baseClass.offer();
+//     inheritClass.offer();
     
-    return 0;
-}
+//     return 0;
+// }

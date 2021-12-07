@@ -93,11 +93,11 @@ public:
         }
     }
 
-    void generateOffer(AllocationStrategy strategy)
+    void generateOffer(AllocationStrategy strategy, ResDistanceType resDistanceType, double resMatchWeight, double randomThreshold, double randomOffset, float &iterationTime)
     {
-        double resMatchWeight = 0.7;
-        double randomOffset = 6;
-        double randomThreshold = 0.3;
+        // double resMatchWeight = 0.5;
+        // double randomOffset = 2;
+        // double randomThreshold = 0.2;
 
         util::shuffleVector(slaves);
         buildTempSlaves();
@@ -120,10 +120,10 @@ public:
                 bestMatchSlaveIdx = matchSelection.randomShuffle(request, tempSlaves);
                 break;
             case DefaultFindMax:
-                bestMatchSlaveIdx = matchSelection.defaultSelect(request,tempSlaves,resMatchWeight);
+                bestMatchSlaveIdx = matchSelection.defaultSelect(request,tempSlaves,resMatchWeight, resDistanceType);
                 break;
             case RandomSelectFindMax:
-                bestMatchSlaveIdx =  matchSelection.randomSelect(request, tempSlaves, resMatchWeight, randomThreshold, randomOffset); 
+                bestMatchSlaveIdx =  matchSelection.randomSelect(request, tempSlaves, resMatchWeight, randomThreshold, randomOffset, resDistanceType, iterationTime); 
                 break;
             
             default:
@@ -145,6 +145,7 @@ public:
             tempSlaves[bestMatchSlaveIdx].setTempResourceChange(request.cpuRequest, request.memRequest);
             tempSlaves[bestMatchSlaveIdx].offer(_offer);
         }
+        iterationTime /= frameworks.size();
     }
 
     void confirmOffer(){
@@ -189,16 +190,17 @@ public:
 
 void testPerformance(int slave, double cpuMax, double memMax, int frameworkCount, Allocator &allocator, 
 vector<Slave> &slaves, vector<Framework> &frameworks, const RMtoINt &RMGenerationWeight,
-int testRounds, int offerRounds, AllocationStrategy strategy);
+int testRounds, int offerRounds, AllocationStrategy strategy, ResDistanceType resDistanceType, 
+double resMatchWeight, double randomOffset, double randomThreshold);
 
 // 
 int main()
 {
-    int slaveCount = 25;
+    int slaveCount = 100;
     double cpuMax = 16;
     double memMax = 32768;
 
-    int frameworkCount =40;
+    int frameworkCount =50;
     double cpuRequest = 1;
     double memRequest = 512;
 
@@ -207,7 +209,14 @@ int main()
     vector<Slave> slaves;
     vector<Framework> frameworks;
 
-    const RMtoINt RMGenerationWeight = {{ResourceRequestModel::CPUHeavy, 10},{ResourceRequestModel::MemHeavy,10},{ResourceRequestModel::Balance,10}};
+    const RMtoINt RMGenerationWeight = {
+        {ResourceRequestModel::CPUHeavy, 10},
+        {ResourceRequestModel::MemHeavy,10},
+        {ResourceRequestModel::Balance,10},
+        {ResourceRequestModel::CPUHeavySmall,10},
+        {ResourceRequestModel::MemHeavySmall,10},
+        {ResourceRequestModel::BalanceSmall,10}
+        };
 
     int avgAllocationFailed = 0;
     double avgResUseRate = 0.0;
@@ -215,14 +224,33 @@ int main()
 
     // allocator.buildSlaves(slaveCount ,cpuMax, memMax);
     // allocator.buildFrameworks(frameworkCount);
-    int testRounds = 50;
-    int offerRounds = 5;
+    int testRounds = 100;
+    int offerRounds = 15;
     
-    //测试Mesos默认的性能
-    AllocationStrategy strategy = AllocationStrategy::RandomSelectFindMax;
-    testPerformance(slaveCount, cpuMax, memMax, frameworkCount, allocator, slaves, frameworks, RMGenerationWeight, testRounds, offerRounds, strategy);
+    // 测试Mesos默认的性能
+    cout << "********** Testing Strategy: " << ToString(AllocationStrategy::MesosDefaultRandomShuffle) << ". **********" << endl;
+    testPerformance(slaveCount, cpuMax, memMax, frameworkCount, allocator, slaves, frameworks, RMGenerationWeight, testRounds, offerRounds, 
+    AllocationStrategy::MesosDefaultRandomShuffle,ResDistanceType::euclideanCentra, 0,0,0);
 
-    testPerformance(slaveCount, cpuMax, memMax, frameworkCount, allocator, slaves, frameworks, RMGenerationWeight, testRounds, offerRounds, AllocationStrategy::MesosDefaultRandomShuffle);
+    cout << "********** Testing Strategy: " << ToString(AllocationStrategy::DefaultFindMax) << ". **********" << endl;
+    testPerformance(slaveCount, cpuMax, memMax, frameworkCount, allocator, slaves, frameworks, RMGenerationWeight, testRounds, offerRounds, 
+    AllocationStrategy::DefaultFindMax,ResDistanceType::euclideanCentra,0.9, 0, 0);
+    testPerformance(slaveCount, cpuMax, memMax, frameworkCount, allocator, slaves, frameworks, RMGenerationWeight, testRounds, offerRounds, 
+    AllocationStrategy::DefaultFindMax,ResDistanceType::euclideanDecentra, 0.4, 0, 0);
+    testPerformance(slaveCount, cpuMax, memMax, frameworkCount, allocator, slaves, frameworks, RMGenerationWeight, testRounds, offerRounds, 
+    AllocationStrategy::DefaultFindMax,ResDistanceType::chebyCentra, 0.9, 0, 0);
+    testPerformance(slaveCount, cpuMax, memMax, frameworkCount, allocator, slaves, frameworks, RMGenerationWeight, testRounds, offerRounds, 
+    AllocationStrategy::DefaultFindMax,ResDistanceType::chebyDecentra, 0.4, 0, 0);
+
+    cout << "********** Testing Strategy: " << ToString(AllocationStrategy::RandomSelectFindMax) << ". **********" << endl;
+    testPerformance(slaveCount, cpuMax, memMax, frameworkCount, allocator, slaves, frameworks, RMGenerationWeight, testRounds, offerRounds, 
+    AllocationStrategy::RandomSelectFindMax, ResDistanceType::euclideanCentra, 0.8, 0.1, 0.5);
+    testPerformance(slaveCount, cpuMax, memMax, frameworkCount, allocator, slaves, frameworks, RMGenerationWeight, testRounds, offerRounds, 
+    AllocationStrategy::RandomSelectFindMax, ResDistanceType::euclideanDecentra, 0.4, 0.2, 0.2);
+    testPerformance(slaveCount, cpuMax, memMax, frameworkCount, allocator, slaves, frameworks, RMGenerationWeight, testRounds, offerRounds, 
+    AllocationStrategy::RandomSelectFindMax, ResDistanceType::chebyCentra, 0.8, 0.1, 0.5);
+    testPerformance(slaveCount, cpuMax, memMax, frameworkCount, allocator, slaves, frameworks, RMGenerationWeight, testRounds, offerRounds, 
+    AllocationStrategy::RandomSelectFindMax, ResDistanceType::chebyDecentra, 0.4, 0.2, 0.2);
 
     return 0;
 }
@@ -230,11 +258,16 @@ int main()
 
 void testPerformance(int slaveCount, double cpuMax, double memMax, int frameworkCount, Allocator &allocator, 
     vector<Slave> &slaves, vector<Framework> &frameworks, const RMtoINt &RMGenerationWeight,
-    int testRounds, int offerRounds, AllocationStrategy strategy)
+    int testRounds, int offerRounds, AllocationStrategy strategy, ResDistanceType resDistanceType,
+    double resMatchWeight, double randomThreshold, double randomOffset)
 {
     int avgAllocationFailed = 0;
     double avgResUseRate = 0;
     double avgResDistance = 0;
+
+    float avgIterationTime = 0;
+    float perOfferIterationTime = 0;
+    float tempIterationTime;
 
     for (int i = 0; i < testRounds; i++)
     {
@@ -249,8 +282,8 @@ void testPerformance(int slaveCount, double cpuMax, double memMax, int framework
         for (int i = 0; i < frameworkCount; i++)
         {
             Framework framework = Framework(i+1);
-            float cpuRandom = util::getAverageRandom(10, 80) * (util::getAverageRandom(0, 10) >= 5 ? 1 : -1) / 100.0;
-            float memRandom = util::getAverageRandom(10, 80) * (util::getAverageRandom(0, 10) >= 5 ? 1 : -1) / 100.0;
+            float cpuRandom = util::getAverageRandom(20, 80) * (util::getAverageRandom(0, 10) >= 5 ? 1 : -1) / 100.0;
+            float memRandom = util::getAverageRandom(20, 80) * (util::getAverageRandom(0, 10) >= 5 ? 1 : -1) / 100.0;
             
             framework.setResourceRequest(util::getWeightedRandomResourceModel(RMGenerationWeight), cpuRandom, memRandom);
             frameworks.push_back(framework);
@@ -258,38 +291,47 @@ void testPerformance(int slaveCount, double cpuMax, double memMax, int framework
         allocator.resetAllocator();
         allocator.setVecData(slaves, frameworks);
 
+        perOfferIterationTime = 0;
         for(int i = 0; i <offerRounds; i++)
         {
-            allocator.generateOffer(strategy);
-
+            tempIterationTime = 0;
             // cout << "++++++++++++++++++++++++++++++ Offer Round: " << i << " ++++++++++++++++++++++++++++++" << endl << endl;
 
+            // for(auto slave : allocator.slaves)
+            // {
+            //     // cout << "Offer Round: " << i << endl;
+            //     slave.printResourceUsageChart();
+            // }
+
+            allocator.generateOffer(strategy, resDistanceType,resMatchWeight, randomThreshold, randomOffset, tempIterationTime);
+
             allocator.confirmOffer();
-            for(auto slave : allocator.slaves)
-            {
-                // cout << "Offer Round: " << i << endl;
-                // slave.printResourceUsageChart();
-            }
-
-
+            perOfferIterationTime += tempIterationTime;
         }
         allocator.calculateResourceAllocatePerform();
         // allocator.printResourceAllocatePerform(strategy);
 
+        avgIterationTime += perOfferIterationTime / offerRounds;
         avgAllocationFailed += allocator.allocationFailedCount;
         avgResUseRate += allocator.totalAvgUseRate;
         avgResDistance += allocator.totalAvgResDistance;
     }
+            // for(auto slave : allocator.slaves)
+            // {
+            //     // cout << "Offer Round: " << i << endl;
+            //     slave.printResourceUsageChart();
+            // }
 
     avgAllocationFailed = avgAllocationFailed / testRounds;
     avgResUseRate = avgResUseRate / testRounds;
     avgResDistance = avgResDistance / testRounds;
+    avgIterationTime = avgIterationTime / testRounds;
 
-    cout << "The Performance of: " << ToString(strategy) << endl;
+    cout << "The Performance of: " << ToString(strategy) << ". Using Resource Distance Type of: " <<  ToString(resDistanceType) << endl;
     cout << "Tested " << testRounds << " Times." << endl;
     cout << "Average Allocation Failed: " << avgAllocationFailed << endl;
     cout << "Average Resource Use Rate: " << avgResUseRate << endl;
-    cout << "Average Resource Distance: " << avgResDistance << endl << endl;
+    cout << "Average Resource Distance: " << avgResDistance << endl;
+    cout << "Average Iteration Time: " << avgIterationTime << endl << endl;
 }
-
 

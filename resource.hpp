@@ -52,8 +52,11 @@ struct ResourceOffer
 enum ResourceRequestModel
 {
     CPUHeavy,
+    CPUHeavySmall,
     MemHeavy,
-    Balance
+    MemHeavySmall,
+    Balance,
+    BalanceSmall
 };
 
 typedef map<ResourceRequestModel, int> RMtoINt;
@@ -63,7 +66,7 @@ enum ResDistanceType
     euclideanCentra,
     euclideanDecentra,
     chebyCentra,
-    chebyDecentra
+    chebyDecentra,
 };
 
 enum AllocationStrategy
@@ -84,16 +87,32 @@ inline const char* ToString(AllocationStrategy s)
     }
 }
 
-const ResourceRequest CPUHEAVY = {.cpuRequest = 6, .memRequest = 2024};
+inline const char* ToString(ResDistanceType t)
+{
+    switch (t)
+    {
+        case euclideanCentra:   return "euclideanCentra";
+        case euclideanDecentra:   return "euclideanDecentra";
+        case chebyCentra: return "chebyCentra";
+        case chebyDecentra: return "chebyDecentra";
+        default:      return "Unknown";
+    }
+}
+
+const ResourceRequest CPUHEAVY = {.cpuRequest = 8, .memRequest = 2048};
 const ResourceRequest MEMHEAVY = {.cpuRequest = 2, .memRequest = 8192};
 const ResourceRequest BALANCE = {.cpuRequest = 4, .memRequest = 4096};
+const ResourceRequest CPUHEAVYSMALL = {.cpuRequest = 4, .memRequest = 1024};
+const ResourceRequest MEMHEAVYSMALL = {.cpuRequest = 1, .memRequest = 4096};
+const ResourceRequest BALANCESMALL = {.cpuRequest = 2, .memRequest = 2048};
+
 
 struct ResourceInfo
 {
     ScalarResource cpu;
     ScalarResource mem;
 
-    double avgUseRate;
+    double avgUseRate = 0.0;
 
     void updateResourceInfo(double cpuUsageChange, double memUsageChange)
     {
@@ -133,6 +152,7 @@ struct ResourceInfo
         double chebyResDistance;
         double  resMatch;
         double resDistance;
+        float avgUserRateParam = 0.0;
 
         resDistance = getResDistance(tempCPURate, tempMEMRate, type);
         
@@ -140,16 +160,20 @@ struct ResourceInfo
         {
         case euclideanCentra:
             // resDistance = getResDistance(tempCPURate, tempMEMRate, type);
-            resMatch = double(1 - weight) * avgUseRate * 100.0 + weight / resDistance; break;
+            avgUserRateParam = (1 - weight) * avgUseRate * 1.0;
+            resMatch = avgUserRateParam + weight / resDistance; break;
         case euclideanDecentra:
             // resDistance = getResDistance(tempCPURate, tempMEMRate, type);
-            resMatch = double(1 - weight) / avgUseRate  +  weight / resDistance; break;
+            avgUserRateParam = (1 - weight) / (avgUseRate * 1.0);
+            resMatch = avgUserRateParam +  weight / resDistance; break;
         case chebyCentra:            
             // resDistance = getResDistance(tempCPURate, tempMEMRate, type);
-            resMatch = double(1 - weight) * avgUseRate  * 100.0 + weight / resDistance ; break;
+            avgUserRateParam = (1 - weight) * avgUseRate * 1.0;
+            resMatch = avgUserRateParam + weight / resDistance ; break;
         case chebyDecentra: 
             // resDistance = getResDistance(tempCPURate, tempMEMRate, type);
-            resMatch = double(1 - weight) / avgUseRate  +  weight / resDistance; break;
+            avgUserRateParam = (1 - weight) / (avgUseRate * 1.0);
+            resMatch = avgUserRateParam +  weight / resDistance; break;
             break;
         
         default:

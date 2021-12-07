@@ -103,42 +103,42 @@ void RandomSelectOptimize::getPerformanceInfo(int times, int realBest, int offse
 }
 
 
-int main()
-{
-    int arraySize = 10000;
-    vector<int> vec;
+// int main()
+// {
+//     int arraySize = 10000;
+//     vector<int> vec;
 
-    int realBest = -1;
-    for (int i = 0; i < arraySize; i++)
-    {
-        int temp = rand() % 10000 + 1;
-        // vec.push_back(i);
-        vec.push_back(temp);
-        realBest = realBest < temp ? temp : realBest;
-        // realBest = realBest < i ? i : realBest;
+//     int realBest = -1;
+//     for (int i = 0; i < arraySize; i++)
+//     {
+//         int temp = rand() % 10000 + 1;
+//         // vec.push_back(i);
+//         vec.push_back(temp);
+//         realBest = realBest < temp ? temp : realBest;
+//         // realBest = realBest < i ? i : realBest;
 
-    }
+//     }
 
-    cout << "The Best number is: " << realBest << endl;
+//     cout << "The Best number is: " << realBest << endl;
 
-    std::random_device r;
-    std::seed_seq seed{r(), r(), r(), r(), r(), r(), r(), r()};
-    std::mt19937 eng(seed);
+//     std::random_device r;
+//     std::seed_seq seed{r(), r(), r(), r(), r(), r(), r(), r()};
+//     std::mt19937 eng(seed);
     
-    default_random_engine rng;
-    shuffle(begin(vec), end(vec), eng);
+//     default_random_engine rng;
+//     shuffle(begin(vec), end(vec), eng);
 
-    int times = 100;
-    int offset = 10;
+//     int times = 100;
+//     int offset = 10;
 
-    RandomSelectOptimize randomSelectOptimize;
+//     RandomSelectOptimize randomSelectOptimize;
 
-    cout << "######## Start Iterating ########" << endl;
+//     cout << "######## Start Iterating ########" << endl;
 
-    randomSelectOptimize.getPerformanceInfo(times, realBest, offset, vec);
+//     randomSelectOptimize.getPerformanceInfo(times, realBest, offset, vec);
 
-    cout << "The Accuracy of Random Select is: " << randomSelectOptimize.accuracy << endl;
-    cout << "The Average Iteration Time of Random Select is: " << randomSelectOptimize.avgIteratTime << endl;
+//     cout << "The Accuracy of Random Select is: " << randomSelectOptimize.accuracy << endl;
+//     cout << "The Average Iteration Time of Random Select is: " << randomSelectOptimize.avgIteratTime << endl;
 
-    return 0;
-}
+//     return 0;
+// }

@@ -1,5 +1,7 @@
 #pragma once
+#include <queue>
 #include "resource.hpp"
+#include "task.hpp"
 
 class Slave
 {
@@ -12,6 +14,11 @@ public:
     double tempMEMChange = 0.0;
     double tempCPUChange = 0.0;
     
+    bool isAllocated = false;
+
+    std::priority_queue<TaskRunInfo> taskQueue;
+    std::vector<TaskRunInfo> taskRunInfoVec;
+
     Slave(){};
 
     Slave(int Id, double cpuMax, double memMax)
@@ -20,47 +27,15 @@ public:
         resourceInfo.initializeMax(cpuMax, memMax);
     };
 
-    void offer(ResourceOffer offer)
+    void offer(ResourceOffer offer, TaskRunInfo taskRunInfo)
     {
         if(offer.slaveId != slaveId)
             return;
-
-        resourceInfo.updateResourceInfo(offer.cpuOffer, offer.memOffer);
+        resourceInfo.updateResource(offer.cpuOffer, offer.memOffer);
+        taskQueue.push(taskRunInfo);
     }
 
-    void printResourceUsageChart()
-    {
-        int chartLength;
-        chartLength = 50;
-
-        cout << "++ " << "********** The resource use rate of Slave: " << slaveId << " **********" << endl;
-        cout << "++ " << endl;
-
-        //  print CPU usage chart
-        cout << "++ CPU Usage: " << resourceInfo.cpu.usage << " / " << resourceInfo.cpu.max << 
-        ". Use rate: " << resourceInfo.cpu.useRate << endl;
-        cout << "++ CPU Use Rate | ";
-        int temp = int(resourceInfo.cpu.useRate * chartLength);
-        for (int i = 0; i < chartLength; i++)
-        {
-            cout << ((i < temp) ? "#" : "-");
-        }
-        cout <<  " |" << endl;
-
-        // print MEM usage chart 
-        cout << "++ MEM Usage: " << resourceInfo.mem.usage << " / " << resourceInfo.mem.max << 
-        ". Use rate: " << resourceInfo.mem.useRate << endl;
-        cout << "++ MEM Use Rate | ";
-        temp = int(resourceInfo.mem.useRate * chartLength);
-        for (int i = 0; i < chartLength; i++)
-        {
-            cout << ((i < temp) ? "#" : "-");
-        }
-        cout <<  " |" << endl;
-
-        cout << "++ " << endl;
-        cout << "++ " << "********** The resource use rate of Slave: " << slaveId << " **********" << endl << endl;
-    }
+    void printResourceUsageChart();
 
     void setTempResourceChange(double _cpuChange, double _memChange)
     {
@@ -73,4 +48,8 @@ public:
         tempCPUChange = 0.0;
         tempMEMChange = 0.0;
     }
+
+    void updateTaskQueue();
+    void updateTaskRunInfo();
+
 };

@@ -56,7 +56,8 @@ enum ResourceRequestModel
     MemHeavy,
     MemHeavySmall,
     Balance,
-    BalanceSmall
+    BalanceSmall,
+    DefaultRM
 };
 
 typedef map<ResourceRequestModel, int> RMtoINt;
@@ -99,12 +100,36 @@ inline const char* ToString(ResDistanceType t)
     }
 }
 
-const ResourceRequest CPUHEAVY = {.cpuRequest = 8, .memRequest = 2048};
-const ResourceRequest MEMHEAVY = {.cpuRequest = 2, .memRequest = 8192};
-const ResourceRequest BALANCE = {.cpuRequest = 4, .memRequest = 4096};
-const ResourceRequest CPUHEAVYSMALL = {.cpuRequest = 4, .memRequest = 1024};
-const ResourceRequest MEMHEAVYSMALL = {.cpuRequest = 1, .memRequest = 4096};
-const ResourceRequest BALANCESMALL = {.cpuRequest = 2, .memRequest = 2048};
+const ResourceRequest CPUHEAVY = {.cpuRequest = 16, .memRequest = 32768};
+const ResourceRequest MEMHEAVY = {.cpuRequest = 4, .memRequest = 131072};
+const ResourceRequest BALANCE = {.cpuRequest = 8, .memRequest = 65536};
+const ResourceRequest CPUHEAVYSMALL = {.cpuRequest = 4, .memRequest = 8192};
+const ResourceRequest MEMHEAVYSMALL = {.cpuRequest = 1, .memRequest = 32768};
+const ResourceRequest BALANCESMALL = {.cpuRequest = 2, .memRequest = 16384};
+
+inline const ResourceRequest RMToRequest(ResourceRequestModel rm)
+{
+    switch (rm)
+    {
+    case CPUHeavy: 
+        return CPUHEAVY;
+    case CPUHeavySmall:
+        return CPUHEAVYSMALL;
+    case MemHeavy:
+        return MEMHEAVY;
+    case MemHeavySmall:
+        return MEMHEAVYSMALL;
+    case Balance:
+        return BALANCE;
+    case BalanceSmall:
+        return BALANCESMALL;
+
+    default:
+        return BALANCESMALL;
+    }
+}
+
+
 
 
 struct ResourceInfo
@@ -114,7 +139,7 @@ struct ResourceInfo
 
     double avgUseRate = 0.0;
 
-    void updateResourceInfo(double cpuUsageChange, double memUsageChange)
+    void updateResource(double cpuUsageChange, double memUsageChange)
     {
         cpu.usage += cpuUsageChange;
         mem.usage += memUsageChange;
@@ -224,6 +249,4 @@ struct ResourceInfo
         }
         return ResDistance;
     }
-
-
 };

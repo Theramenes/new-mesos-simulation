@@ -58,7 +58,8 @@
 			"fortran": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt"
 		},
 		"files.associations": {
-			"ostream": "cpp"
+			"ostream": "cpp",
+			"iostream": "cpp"
 		}
 	}
 }

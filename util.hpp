@@ -5,6 +5,7 @@
 #include <random>
 
 #include "resource.hpp"
+#include "task.hpp"
 
 using namespace std;
 
@@ -18,35 +19,18 @@ namespace util
         return distr(generator);
     }
 
-    ResourceRequestModel getWeightedRandomResourceModel(RMtoINt weights)
-    {
-        int weightSum = 0;
-        RMtoINt::iterator it;
-        for (it = weights.begin(); it != weights.end(); it++)
-        {
-            weightSum += it->second;
-        }
-        int random = getAverageRandom(0, weightSum);
-        ResourceRequestModel rm;
-
-        for (it = weights.begin(); it != weights.end(); it++)
-        {
-            if(random < it->second)
-            {
-                rm = it->first;
-                break;
-            }
-            random -= it->second;
-        }
-        return rm;
-    }
-
     template<typename T>
     void shuffleVector(vector<T> &vec)
     {
         auto rng = std::default_random_engine {};
         shuffle(std::begin(vec), std::end(vec), rng);
     }
+
+    ResourceRequestModel generateWeightedRandomResourceModel(RMtoINt weights);
+
+    TaskTemplateInfo generateTaskTemplateInfo(IntTaskInfoMap weights);
+} // namespace util
+
 
     // void averageRandom()
     // {
@@ -68,4 +52,3 @@ namespace util
     // {
     //     return map_init_helper<T>(item);
     // }
-} // namespace util

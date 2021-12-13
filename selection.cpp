@@ -45,6 +45,7 @@ ResDistanceType resDistanceType, float &iterationTime)
     double tempResMatch;
     double tempMax = -1.0;
     int bestMatchSlaveIdx = -1;
+    int reserveSlaveIdx = -1;
 
     float endThreshold = 0.95;
     int endOffset = 4;
@@ -72,6 +73,10 @@ ResDistanceType resDistanceType, float &iterationTime)
             bestMatchSlaveIdx = i;
             return bestMatchSlaveIdx;
         }
+
+        // 将第一个资源足够的物理机作为预留选项
+        if(reserveSlaveIdx == -1)
+            reserveSlaveIdx == i;
 
         //  前一部分 只看不选
         if (i < thresholdPoint)
@@ -111,8 +116,13 @@ int SlaveSelection::randomShuffle(ResourceRequest &request, vector<Slave> &slave
         if(!slaveVec[i].resourceInfo.isAllocatable(request))
             continue;
 
+        if(slaveVec[i].isAllocated)
+            continue;
+
         canFindSlave = true;
         bestMatchSlaveIdx = i;
+        slaveVec[i].isAllocated = true;
+        return bestMatchSlaveIdx;
         /* code */
     }
     return bestMatchSlaveIdx;

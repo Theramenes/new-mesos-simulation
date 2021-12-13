@@ -1,108 +1,36 @@
 #pragma once
 #include "resource.hpp"
-// #include "util.hpp"
+#include "task.hpp"
 
 class Framework
 {
 private:
-    /* data */
+    int roundsBeforeRequest;
+    void _setResourceRequest(ResourceRequest request);
+    void _setResourceRequest(ResourceRequest request, float cpuRandom, float memRandom);
+    bool _isRequesting;
+
 public:
     int frameworkId;
+    Task task;
+    
+    // ResourceRequest resourceRequest;
 
-    Framework(int id): frameworkId(id){}
+    Framework(int id);
 
-    Framework(int id, double cpuRequest, double memRequest){
-        frameworkId = id;
-        resourceRequest.cpuRequest = cpuRequest;
-        resourceRequest.memRequest = memRequest;
-    }
+    Framework(int id, double cpuRequest, double memRequest);
 
-    ResourceRequest resourceRequest;
+    void generateTask(float cpuRandom, float memRandom, float runFreqRandom, float durationRandom);
 
-    void setResourceRequest(ResourceRequestModel rm)
-    {
-        switch (rm)
-        {
-            case CPUHeavy:
-                resourceRequest.cpuRequest = CPUHEAVY.cpuRequest;
-                resourceRequest.memRequest = CPUHEAVY.memRequest;
-                break;
-            case MemHeavy:
-                resourceRequest.cpuRequest = MEMHEAVY.cpuRequest;
-                resourceRequest.memRequest = MEMHEAVY.memRequest;
-                break;
-            case Balance:
-                resourceRequest.cpuRequest = BALANCE.cpuRequest;
-                resourceRequest.memRequest = BALANCE.memRequest;
-                break;
+    void setResourceRequest(ResourceRequestModel rm);
 
-            default:
-                break;
-        }
-    }
+    void setResourceRequestModel(ResourceRequestModel rm, float cpuRandom, float memRandom);
 
-    void setResourceRequest(ResourceRequestModel rm, float cpuRandom, float memRandom)
-    {
-        // int random = util::getAverageRandom(randomLimitLower, randomLimitUpper);
-        // int randomSign = util::getAverageRandom(0, 10);
-        double cpuOffset = cpuRandom;
-        double memOffset = memRandom;
+    void printResourceRequest();
 
-        switch (rm)
-        {
-            case CPUHeavy:
-                cpuOffset *= CPUHEAVY.cpuRequest ;
-                memOffset *= CPUHEAVY.memRequest; 
+    void updateRequestingStatus();
 
-                resourceRequest.cpuRequest = CPUHEAVY.cpuRequest + cpuOffset;
-                resourceRequest.memRequest = CPUHEAVY.memRequest + memOffset;
-                break;
-            case MemHeavy:
-                cpuOffset *= MEMHEAVY.cpuRequest ;
-                memOffset *= MEMHEAVY.memRequest; 
+    void sleepTurns(int turn);
 
-                resourceRequest.cpuRequest = MEMHEAVY.cpuRequest + cpuOffset;
-                resourceRequest.memRequest = MEMHEAVY.memRequest + memOffset;
-                break;
-            case Balance:
-                cpuOffset *= BALANCE.cpuRequest ;
-                memOffset *= BALANCE.memRequest; 
-
-                resourceRequest.cpuRequest = BALANCE.cpuRequest + cpuOffset;
-                resourceRequest.memRequest = BALANCE.memRequest + memOffset;
-                break;
-
-            case CPUHeavySmall:
-                cpuOffset *= CPUHEAVYSMALL.cpuRequest ;
-                memOffset *= CPUHEAVYSMALL.memRequest; 
-
-                resourceRequest.cpuRequest = CPUHEAVYSMALL.cpuRequest + cpuOffset;
-                resourceRequest.memRequest = CPUHEAVYSMALL.memRequest + memOffset;
-                break;
-            case MemHeavySmall:
-                cpuOffset *= MEMHEAVYSMALL.cpuRequest ;
-                memOffset *= MEMHEAVYSMALL.memRequest; 
-
-                resourceRequest.cpuRequest = MEMHEAVYSMALL.cpuRequest + cpuOffset;
-                resourceRequest.memRequest = MEMHEAVYSMALL.memRequest + memOffset;
-                break;
-            case BalanceSmall:
-                cpuOffset *= BALANCESMALL.cpuRequest ;
-                memOffset *= BALANCESMALL.memRequest; 
-
-                resourceRequest.cpuRequest = BALANCESMALL.cpuRequest + cpuOffset;
-                resourceRequest.memRequest = BALANCESMALL.memRequest + memOffset;
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    void printResourceRequest()
-    {
-        cout << "********** Resource request of Framework Id: " << frameworkId 
-        << " CPU request: " << resourceRequest.cpuRequest << " core." 
-        << " MEM request: " << resourceRequest.memRequest << " MB." << endl;
-    }
+    bool isRequesting();
 };
